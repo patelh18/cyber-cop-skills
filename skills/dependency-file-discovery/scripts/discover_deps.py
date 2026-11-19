@@ -31,6 +31,10 @@ DEFAULT_EXCLUDES = {
     ".nuxt", ".cache", ".terraform", "Pods", ".bundle", "_build", "deps",
     ".dart_tool", ".pub-cache", "coverage", ".yarn",
 }
+# Cyber-Cop's own work folder: cve-fix keeps pre-fix copies of manifests and
+# lockfiles there (cases/<CVE>/backup/), which must never be scanned as part
+# of the project. Excluded even with --include-dev-dirs.
+ALWAYS_EXCLUDE = {".cyber-cop"}
 
 # Each rule: (glob pattern on basename, ecosystem, kind, format, package_manager)
 # ecosystem uses OSV ecosystem names so downstream CVE lookups can reuse them.
@@ -235,7 +239,7 @@ def dockerfile_base_images(path: str) -> list[str]:
 def walk(root: str, excludes: set[str], max_depth: int | None):
     root_depth = root.rstrip(os.sep).count(os.sep)
     for dirpath, dirnames, filenames in os.walk(root, followlinks=False):
-        dirnames[:] = sorted(d for d in dirnames if d not in excludes)
+        dirnames[:] = sorted(d for d in dirnames if d not in excludes and d not in ALWAYS_EXCLUDE)
         if max_depth is not None and dirpath.count(os.sep) - root_depth >= max_depth:
             dirnames[:] = []
         for name in sorted(filenames):
@@ -368,7 +372,7 @@ def main(argv=None) -> int:
         print(f"error: {args.root} is not a directory", file=sys.stderr)
         return 2
     excludes = set() if args.include_dev_dirs else set(DEFAULT_EXCLUDES)
-    excludes |= set(args.exclude)
+    excludes |= set(args.exclude) | ALWAYS_EXCLUDE
     result = discover(args.root, excludes, args.max_depth)
     text = json.dumps(result, indent=2 if (args.pretty or args.output) else None)
     if args.output:

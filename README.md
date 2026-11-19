@@ -5,9 +5,9 @@ Claude skills, agents and tools for finding and handling CVEs in a codebase day 
 | Skill | What it does |
 |---|---|
 | [dependency-file-discovery](skills/dependency-file-discovery/SKILL.md) | Detects the stack and lists the manifests, lockfiles and container files to scan for CVEs, as `deps-files.json` (schema v1). Other scanner skills consume it. |
-| [cve-dependency-scan](skills/cve-dependency-scan/SKILL.md) | Checks the exact versions of the project's **direct** dependencies against CVEs published on [cve.now](https://cve.now) and [cve.org](https://www.cve.org) for today or a date range, and saves the IDs that need addressing to `.cyber-cop/cve-ids.direct.txt`. |
+| [cve-dependency-scan](skills/cve-dependency-scan/SKILL.md) | Checks the exact versions of the project's **direct** dependencies (npm, PyPI, RubyGems, Composer, Dockerfile installs) and the **PHP runtime** it pins against CVEs published on [cve.now](https://cve.now) and [cve.org](https://www.cve.org) for today or a date range, and saves the IDs that need addressing to `.cyber-cop/cve-ids.direct.txt`. |
 | [cve-subdependency-scan](skills/cve-subdependency-scan/SKILL.md) | Builds the full dependency tree from lockfiles (or resolves it with `--resolve`), checks the **transitive** (sub) dependencies against CVEs published on [cve.now](https://cve.now) and [cve.org](https://www.cve.org) for today or a date range, shows the chain that pulls each one in, and saves the IDs to `.cyber-cop/cve-ids.transitive.txt`. |
-| [cve-reproduce](skills/cve-reproduce/SKILL.md) | Confirms each CVE in `.cyber-cop/cve-ids.*.txt` is really in the codebase: finds where the package is imported and writes a **presence test** in the project's own framework (pytest/unittest, jest/vitest/mocha/node:test, RSpec/Minitest, go test) that fails while the vulnerable version is resolved and passes once fixed. Defensive: it reads versions, it never runs an exploit. |
+| [cve-reproduce](skills/cve-reproduce/SKILL.md) | Confirms each CVE in `.cyber-cop/cve-ids.*.txt` is really in the codebase: finds where the package is imported and writes a **presence test** in the project's own framework (pytest/unittest, jest/vitest/mocha/node:test, RSpec/Minitest, go test, PHPUnit or plain `php`) that fails while the vulnerable version is resolved and passes once fixed. Defensive: it reads versions, it never runs an exploit. |
 | [cve-migration-plan](skills/cve-migration-plan/SKILL.md) | Plans the upgrade from the current to the nearest fixed version: package-manager strategy (upgrade, refresh, override/resolution, pin), the code and APIs that use the dependency, breaking changes to review, and the regression tests that gate it. Records a person's approval. |
 | [cve-fix](skills/cve-fix/SKILL.md) | Applies an **approved** plan, trying its strategies in order, and verifies with the presence test plus regression tests against a pre-change baseline. Restores every file if the fix fails or regresses anything. |
 | [cve-remediate](skills/cve-remediate/SKILL.md) | Orchestrates the lifecycle (scan → reproduce → plan → **approval checkpoint** → fix → rescan), shows where every CVE stands with `status.py`, and hands per-CVE stages to the plugin's subagents. |
@@ -55,6 +55,10 @@ checkpoint sits between plan and fix because that is the first step that
 changes the code. The plugin also ships three subagents (`agents/`):
 `cve-reproducer` and `cve-migration-planner` run one per CVE in parallel;
 `cve-fixer` runs one at a time because fixes share lockfiles.
+
+`skills/cve-remediate/tests/test_php_e2e.py` runs the whole chain (scan →
+reproduce → plan → approve → fix → rescan) on a PHP fixture app for the real
+CVE-2026-109619, offline, against recorded cve.now / cve.org responses.
 
 Ask Claude things like "take care of today's CVEs", "reproduce CVE-2021-23337",
 "plan the fix for the qs CVE", or "what CVE work is pending?".
