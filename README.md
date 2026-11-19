@@ -6,6 +6,7 @@ Claude skills, agents and tools for finding and handling CVEs in a codebase day 
 |---|---|
 | [dependency-file-discovery](skills/dependency-file-discovery/SKILL.md) | Detects the stack and lists the manifests, lockfiles and container files to scan for CVEs, as `deps-files.json` (schema v1). Other scanner skills consume it. |
 | [cve-dependency-scan](skills/cve-dependency-scan/SKILL.md) | Checks the exact versions of the project's **direct** dependencies against CVEs published on [cve.now](https://cve.now) and [cve.org](https://www.cve.org) for today or a date range, and saves the IDs that need addressing to `.cyber-cop/cve-ids.direct.txt`. |
+| [cve-subdependency-scan](skills/cve-subdependency-scan/SKILL.md) | Builds the full dependency tree from lockfiles (or resolves it with `--resolve`), checks the **transitive** (sub) dependencies against CVEs published on [cve.now](https://cve.now) and [cve.org](https://www.cve.org) for today or a date range, shows the chain that pulls each one in, and saves the IDs to `.cyber-cop/cve-ids.transitive.txt`. |
 
 ## Install
 
@@ -26,6 +27,7 @@ own, e.g. in CI or cron, and exit `1` when there is something to address:
 
 ```bash
 python3 skills/cve-dependency-scan/scripts/cve_scan.py /path/to/project --days 1
+python3 skills/cve-subdependency-scan/scripts/subdep_scan.py /path/to/project --days 1
 ```
 
 ## Conventions for skills in this repo
