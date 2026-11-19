@@ -1,0 +1,9 @@
+{
+  "name": "cyber-cop",
+  "version": "0.1.0",
+  "description": "Skills, agents and tools for proactive, day-to-day CVE protection of a codebase.",
+  "author": { "name": "patelh18" },
+  "repository": "https://github.com/patelh18/cyber-cop-skills",
+  "license": "MIT",
+  "keywords": ["security", "cve", "vulnerabilities", "dependencies"]
+}

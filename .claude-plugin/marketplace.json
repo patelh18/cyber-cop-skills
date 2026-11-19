@@ -1,0 +1,11 @@
+{
+  "name": "cyber-cop",
+  "owner": { "name": "patelh18" },
+  "plugins": [
+    {
+      "name": "cyber-cop",
+      "source": "./",
+      "description": "Skills, agents and tools for proactive, day-to-day CVE protection of a codebase."
+    }
+  ]
+}
