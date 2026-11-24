@@ -12,6 +12,12 @@ Claude skills, agents and tools for finding and handling CVEs in a codebase day 
 | [cve-fix](skills/cve-fix/SKILL.md) | Applies an **approved** plan, trying its strategies in order, and verifies with the presence test plus regression tests against a pre-change baseline. Restores every file if the fix fails or regresses anything. |
 | [cve-remediate](skills/cve-remediate/SKILL.md) | Orchestrates the lifecycle (scan → reproduce → plan → **approval checkpoint** → fix → rescan), shows where every CVE stands with `status.py`, and hands per-CVE stages to the plugin's subagents. |
 
+### Writing tools
+
+| Skill | What it does |
+|---|---|
+| [humanize-writing](skills/humanize-writing/SKILL.md) | Rewrites a Markdown, text or Word document so it reads like a person wrote it (varied rhythm, no stock AI phrasing, filler, em-dash or triplet habits, optional voice matching) while keeping its structure exactly. `structure_diff.py` proves headings, lists, tables, code, links, citations, numbers and emphasis are unchanged; `style_check.py` gives a before/after score. |
+
 ## Install
 
 As a Claude Code plugin:
