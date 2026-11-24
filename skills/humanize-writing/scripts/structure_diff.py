@@ -35,7 +35,7 @@ HEADING = re.compile(r"^\s{0,3}(#{1,6})\s+(.*?)\s*#*\s*$")
 SETEXT = re.compile(r"^\s{0,3}(=+|-+)\s*$")
 HR = re.compile(r"^\s{0,3}([-*_])(\s*\1){2,}\s*$")
 BULLET = re.compile(r"^(\s*)([-*+])\s+(\[[ xX]\]\s+)?(.*)$")
-ORDERED = re.compile(r"^(\s*)(\d{1,9})([.)])\s+(.*)$")
+ORDERED = re.compile(r"^(\s*)(\d{1,9}|[a-z]|[ivx]{1,5})([.)])\s+(.*)$")
 QUOTE = re.compile(r"^\s{0,3}>\s?(.*)$")
 TABLE_ROW = re.compile(r"^\s*\|.*\|\s*$")
 TABLE_SEP = re.compile(r"^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$")
@@ -142,7 +142,10 @@ def parse_markdown(text):
                 marker = "task" if m.group(3) else "bullet"
                 body = m.group(4)
             else:
-                marker = "ordered" + m.group(3)
+                kind = ("ordered" if m.group(2).isdigit()
+                        else "roman" if m.group(2) not in "abcdefgh" and set(m.group(2)) <= set("ivx")
+                        else "letter")
+                marker = kind + m.group(3)
                 body = m.group(4)
             item = [body]
             i += 1

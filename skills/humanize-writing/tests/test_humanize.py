@@ -128,6 +128,14 @@ class StructureDiffTest(unittest.TestCase):
         self.assertEqual(diff_text(doc, doc.replace("text 5", "other words 5")), [])
         self.assertEqual(self.types(diff_text(doc, doc.replace("  - b 2", "- b 2"))), {"structure"})
 
+    def test_lettered_sublists(self):
+        doc = "1. **Top** item 1\n    a. sub one 20\n    b. sub two\n2. Next\n"
+        kinds = [(b["marker"], b["depth"]) for b in structure_diff.parse_markdown(doc)]
+        self.assertEqual(kinds, [("ordered.", 0), ("letter.", 2), ("letter.", 2), ("ordered.", 0)])
+        self.assertEqual(diff_text(doc, doc.replace("sub two", "second sub")), [])
+        self.assertEqual(self.types(diff_text(doc, doc.replace("    b. sub two\n", ""))), {"structure"})
+        self.assertEqual(self.types(diff_text(doc, doc.replace("20", "twenty"))), {"numbers"})
+
 
 def make_docx(paragraphs):
     """paragraphs: list of (style or None, text, bold:bool, numbered:bool)."""
